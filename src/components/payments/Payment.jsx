@@ -1,0 +1,133 @@
+import React, { useState } from "react";
+import axios from "axios";
+import { useLocation, useNavigate } from "react-router-dom";
+
+const Payment = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { reservasiId, guestName, guestEmail, guestPhone } = location.state;
+
+  const [paymentMethod, setPaymentMethod] = useState("qris");
+  const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState(null);
+
+  const handlePayment = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.post(`http://localhost:5000/reservasi/core-payment/${reservasiId}`, { paymentMethod });
+      setResult(res.data.data);
+    } catch (error) {
+      console.error(error);
+      alert("Gagal memproses pembayaran");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCancel = async () => {
+    try {
+      await axios.post(`http://localhost:5000/reservasi/cancelled/${reservasiId}`);
+      setStatus("cancel");
+    } catch (error) {
+      console.error(error);
+      alert("Gagal membatalkan pembayaran");
+    }
+  };
+
+  const handleCheckStatus = async () => {
+    try {
+      const res = await axios.get(`http://localhost:5000/reservasi/cek-status-pembayaran/${reservasiId}`);
+      setStatus(res.data.status);
+    } catch (error) {
+      console.error(error);
+      alert("Gagal memeriksa status pembayaran");
+    }
+  };
+
+  const handleBack = async () => {
+    try {
+      await handleCheckStatus();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      navigate("/available-room");
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="max-w-2xl w-full bg-white shadow-xl rounded-2xl p-8">
+        {/* HEADER */}
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-gray-800 mb-1">Pembayaran Reservasi</h1>
+          <p className="text-sm text-gray-500">
+            {guestName} • {guestEmail} • {guestPhone}
+          </p>
+        </div>
+
+        {/* PILIH METODE */}
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold text-gray-700 mb-2">Pilih Metode Pembayaran</h2>
+          <select className="border rounded-lg w-full p-3 focus:ring-2 focus:ring-blue-500 outline-none" value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)}>
+            <option value="qris">QRIS</option>
+            <option value="bni">Bank Transfer - BNI</option>
+            <option value="bri">Bank Transfer - BRI</option>
+          </select>
+        </div>
+
+        {/* ACTION BUTTON */}
+        <button onClick={handlePayment} disabled={loading} className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition mb-6">
+          {loading ? "Memproses..." : "Bayar Sekarang"}
+        </button>
+
+        {/* RESULT */}
+        {result && (
+          <div className="mt-4 border-t pt-6">
+            <h3 className="text-lg font-semibold mb-4 text-gray-700">Instruksi Pembayaran</h3>
+
+            {paymentMethod === "qris" && result.actions ? (
+              <div className="flex flex-col items-center">
+                <img src={`http://localhost:5000/proxy/qris-qr-code?url=${encodeURIComponent(result.actions.find((a) => a.name === "generate-qr-code")?.url)}`} alt="QR Code" className="w-60 h-60 rounded-lg border p-2 shadow-md" />
+                <p className="mt-3 text-sm text-gray-500">Scan QRIS di atas dengan aplikasi e-wallet atau mobile banking</p>
+              </div>
+            ) : (
+              <div className="bg-gray-50 p-4 rounded-lg shadow-inner">
+                <p className="mb-1">
+                  <strong>Bank:</strong> {result.va_numbers?.[0]?.bank?.toUpperCase()}
+                </p>
+                <p>
+                  <strong>VA Number:</strong> {result.va_numbers?.[0]?.va_number}
+                </p>
+              </div>
+            )}
+
+            {/* STATUS */}
+            {status && (
+              <div className="mt-4 text-center">
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${status === "settlement" ? "bg-green-100 text-green-700" : status === "cancel" ? "bg-red-100 text-red-700" : "bg-yellow-100 text-yellow-700"}`}>
+                  Status: {status}
+                </span>
+              </div>
+            )}
+
+            {/* ACTION BUTTONS */}
+            <div className="mt-6 flex flex-wrap gap-3 justify-center">
+              <button onClick={handleCheckStatus} className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                Cek Status
+              </button>
+              <button onClick={handleCancel} className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
+                Batalkan
+              </button>
+              <button onClick={handleBack} className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
+                Kembali
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default Payment;

@@ -19,7 +19,6 @@ import AvailableRoom from "./components/payments/AvailableRoom.jsx";
 const App = () => {
   const location = useLocation();
 
-  // list halaman yg ga butuh reservasi/footer
   const cleanRoutes = ["/booking", "/payment", "/available-room"];
 
   const isClean = cleanRoutes.some((path) => location.pathname.startsWith(path));

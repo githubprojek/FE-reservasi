@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
+import useReservasiStore from "../store/reservasi/useReservasiStore";
 
 const Payment = () => {
   const location = useLocation();
@@ -12,47 +12,40 @@ const Payment = () => {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState(null);
 
+  const { bayarReservasi, cancelReservasi, cekStatusPembayaran } = useReservasiStore();
+
   const handlePayment = async () => {
     setLoading(true);
-    try {
-      const res = await axios.post(`http://localhost:5000/reservasi/core-payment/${reservasiId}`, { paymentMethod });
+    const res = await bayarReservasi(reservasiId, paymentMethod);
+    if (res.success) {
       setResult(res.data.data);
-    } catch (error) {
-      console.error(error);
-      alert("Gagal memproses pembayaran");
-    } finally {
-      setLoading(false);
+    } else {
+      alert(res.message);
     }
+    setLoading(false);
   };
 
   const handleCancel = async () => {
-    try {
-      await axios.post(`http://localhost:5000/reservasi/cancelled/${reservasiId}`);
+    const res = await cancelReservasi(reservasiId);
+    if (res.success) {
       setStatus("cancel");
-    } catch (error) {
-      console.error(error);
-      alert("Gagal membatalkan pembayaran");
+    } else {
+      alert(res.message);
     }
   };
 
   const handleCheckStatus = async () => {
-    try {
-      const res = await axios.get(`http://localhost:5000/reservasi/cek-status-pembayaran/${reservasiId}`);
+    const res = await cekStatusPembayaran(reservasiId);
+    if (res.success) {
       setStatus(res.data.status);
-    } catch (error) {
-      console.error(error);
-      alert("Gagal memeriksa status pembayaran");
+    } else {
+      alert(res.message);
     }
   };
 
   const handleBack = async () => {
-    try {
-      await handleCheckStatus();
-    } catch (err) {
-      console.error(err);
-    } finally {
-      navigate("/available-room");
-    }
+    await handleCheckStatus();
+    navigate("/available-room");
   };
 
   return (
@@ -88,7 +81,7 @@ const Payment = () => {
 
             {paymentMethod === "qris" && result.actions ? (
               <div className="flex flex-col items-center">
-                <img src={`http://localhost:5000/proxy/qris-qr-code?url=${encodeURIComponent(result.actions.find((a) => a.name === "generate-qr-code")?.url)}`} alt="QR Code" className="w-60 h-60 rounded-lg border p-2 shadow-md" />
+                <img src={`https://be-reservasi.vercel.app/proxy/qris-qr-code?url=${encodeURIComponent(result.actions.find((a) => a.name === "generate-qr-code")?.url)}`} alt="QR Code" className="w-60 h-60 rounded-lg border p-2 shadow-md" />
                 <p className="mt-3 text-sm text-gray-500">Scan QRIS di atas dengan aplikasi e-wallet atau mobile banking</p>
               </div>
             ) : (

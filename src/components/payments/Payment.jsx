@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import useReservasiStore from "../store/reservasi/useReservasiStore";
+import useReservasiStore from "./useReservasiStore.js";
 
 const Payment = () => {
   const location = useLocation();

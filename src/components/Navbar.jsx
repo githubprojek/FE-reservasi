@@ -32,9 +32,9 @@ const Navbar = () => {
             <img src={logo} alt="Hotel Logo" className="h-20 sm:h-28 w-auto object-contain" />
           </NavLink>
           {/* Tombol Book Now */}
-          <Button onClick={() => window.open("/available-room", "_blank")} className={`${isSticky ? "fixed top-0 right-0" : "absolute right-0 top-4"} z-[50]`}>
-            Book Now
-          </Button>
+          <NavLink to="/available-room" target="_blank" className={`${isSticky ? "fixed top-0 right-0" : "absolute right-0 top-4"} z-[50]`}>
+            <Button>Book Now</Button>
+          </NavLink>
         </div>
       </div>
 

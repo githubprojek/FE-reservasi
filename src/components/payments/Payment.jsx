@@ -7,7 +7,7 @@ const Payment = () => {
   const navigate = useNavigate();
   const { reservasiId, guestName, guestEmail, guestPhone } = location.state;
 
-  const [paymentMethod, setPaymentMethod] = useState("qris");
+  const [paymentMethod, setPaymentMethod] = useState("bca");
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState(null);
@@ -63,8 +63,7 @@ const Payment = () => {
         <div className="mb-6">
           <h2 className="text-lg font-semibold text-gray-700 mb-2">Pilih Metode Pembayaran</h2>
           <select className="border rounded-lg w-full p-3 focus:ring-2 focus:ring-blue-500 outline-none" value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)}>
-            <option value="qris">QRIS</option>
-            <option value="bni">Bank Transfer - BNI</option>
+            <option value="bni">Bank Transfer - BCA</option>
             <option value="bri">Bank Transfer - BRI</option>
           </select>
         </div>
@@ -77,25 +76,16 @@ const Payment = () => {
         {/* RESULT */}
         {result && (
           <div className="mt-4 border-t pt-6">
-            <h3 className="text-lg font-semibold mb-4 text-gray-700">Instruksi Pembayaran</h3>
-
-            {paymentMethod === "qris" && result.actions ? (
-              <div className="flex flex-col items-center">
-                <img src={`https://be-reservasi.vercel.app/proxy/qris-qr-code?url=${encodeURIComponent(result.actions.find((a) => a.name === "generate-qr-code")?.url)}`} alt="QR Code" className="w-60 h-60 rounded-lg border p-2 shadow-md" />
-                <p className="mt-3 text-sm text-gray-500">Scan QRIS di atas dengan aplikasi e-wallet atau mobile banking</p>
-              </div>
-            ) : (
-              <div className="bg-gray-50 p-4 rounded-lg shadow-inner">
-                <p className="mb-1">
-                  <strong>Bank:</strong> {result.va_numbers?.[0]?.bank?.toUpperCase()}
-                </p>
-                <p>
-                  <strong>VA Number:</strong> {result.va_numbers?.[0]?.va_number}
-                </p>
-              </div>
-            )}
-
-            {/* STATUS */}
+            <h3 className="text-lg font-semibold mb-4 text-gray-700">Instruksi Pembayaran</h3>(
+            <div className="bg-gray-50 p-4 rounded-lg shadow-inner">
+              <p className="mb-1">
+                <strong>Bank:</strong> {result.va_numbers?.[0]?.bank?.toUpperCase()}
+              </p>
+              <p>
+                <strong>VA Number:</strong> {result.va_numbers?.[0]?.va_number}
+              </p>
+            </div>
+            ){/* STATUS */}
             {status && (
               <div className="mt-4 text-center">
                 <span className={`px-3 py-1 rounded-full text-sm font-medium ${status === "settlement" ? "bg-green-100 text-green-700" : status === "cancel" ? "bg-red-100 text-red-700" : "bg-yellow-100 text-yellow-700"}`}>
@@ -103,7 +93,6 @@ const Payment = () => {
                 </span>
               </div>
             )}
-
             {/* ACTION BUTTONS */}
             <div className="mt-6 flex flex-wrap gap-3 justify-center">
               <button onClick={handleCheckStatus} className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">

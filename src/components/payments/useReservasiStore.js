@@ -36,6 +36,7 @@ export const useReservasiStore = create((set, get) => ({
       const res = await axiosReservasi.post(`/core-payment/${reservasiId}`, {
         paymentMethod,
       });
+      console.log(paymentMethod);
       return { success: true, data: res.data };
     } catch (err) {
       console.error("Error bayarReservasi:", err);

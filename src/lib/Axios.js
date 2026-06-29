@@ -13,3 +13,4 @@ export const axiosHotel = createAxiosInstance("hotel");
 export const axiosReservasi = createAxiosInstance("reservasi");
 export const axiosRoom = createAxiosInstance("room");
 export const axiosFacilities = createAxiosInstance("fasilitas");
+export const axiosPayment = createAxiosInstance("payment");

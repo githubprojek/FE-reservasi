@@ -45,7 +45,7 @@ const Booking = () => {
     const result = await createReservasi(form);
 
     if (result.success) {
-      const reservasiId = result.data.reservasi._id;
+      const reservasiId = result.data.content.reservasi._id;
 
       navigate(`/payment/${reservasiId}`, {
         state: {

@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useRoomStore } from "../detailRoom/useRoomStore.js";
 import { useNavigate } from "react-router-dom";
+import { useMinDateToday, getMinCheckoutDate } from "../../lib/Date.js";
 
 const AvailableRoom = () => {
   const { fetchRoom, roomList, fetchAvailableRooms, availableRoom, loading, error } = useRoomStore();
   const navigate = useNavigate();
 
+  const minDate = useMinDateToday();
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
   const [searched, setSearched] = useState(false);
@@ -33,11 +35,11 @@ const AvailableRoom = () => {
       <div className="bg-white shadow-md rounded-xl p-4 flex flex-col sm:flex-row sm:items-end gap-4 mb-8 border border-gray-200">
         <div className="flex-1">
           <label className="block text-sm font-medium text-gray-700 mb-1">Check-In</label>
-          <input type="date" value={checkIn} onChange={(e) => setCheckIn(e.target.value)} className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+          <input type="date" value={checkIn} min={minDate} onChange={(e) => setCheckIn(e.target.value)} className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
         </div>
         <div className="flex-1">
           <label className="block text-sm font-medium text-gray-700 mb-1">Check-Out</label>
-          <input type="date" value={checkOut} onChange={(e) => setCheckOut(e.target.value)} className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+          <input type="date" value={checkOut} min={getMinCheckoutDate(checkIn)} onChange={(e) => setCheckOut(e.target.value)} className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
         </div>
         <div>
           <button onClick={handleSearch} className="w-full bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 shadow-sm transition">

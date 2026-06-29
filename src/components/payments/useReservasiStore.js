@@ -1,6 +1,6 @@
 // useReservasiStore.js
 import { create } from "zustand";
-import { axiosReservasi } from "../../lib/Axios";
+import { axiosReservasi, axiosPayment } from "../../lib/Axios";
 
 export const useReservasiStore = create((set, get) => ({
   reservasiList: [],
@@ -13,9 +13,9 @@ export const useReservasiStore = create((set, get) => ({
     try {
       const res = await axiosReservasi.post("/createReservasi", newData);
 
-      if (res.data?.reservasi) {
+      if (res.data?.content?.reservasi) {
         set((state) => ({
-          reservasiList: [...state.reservasiList, res.data.reservasi],
+          reservasiList: [...state.reservasiList, res.data.content.reservasi],
         }));
       }
 
@@ -33,7 +33,7 @@ export const useReservasiStore = create((set, get) => ({
   // 🔥 Bayar reservasi
   bayarReservasi: async (reservasiId, paymentMethod) => {
     try {
-      const res = await axiosReservasi.post(`/core-payment/${reservasiId}`, {
+      const res = await axiosPayment.post(`/core-payment/${reservasiId}`, {
         paymentMethod,
       });
       console.log(paymentMethod);
@@ -50,7 +50,7 @@ export const useReservasiStore = create((set, get) => ({
   // 🔥 Batalkan reservasi
   cancelReservasi: async (reservasiId) => {
     try {
-      const res = await axiosReservasi.post(`/cancelled/${reservasiId}`);
+      const res = await axiosPayment.post(`/cancelled/${reservasiId}`);
       return { success: true, data: res.data };
     } catch (err) {
       console.error("Error cancelReservasi:", err);
@@ -64,7 +64,7 @@ export const useReservasiStore = create((set, get) => ({
   // 🔥 Cek status pembayaran
   cekStatusPembayaran: async (reservasiId) => {
     try {
-      const res = await axiosReservasi.get(`/cek-status-pembayaran/${reservasiId}`);
+      const res = await axiosPayment.get(`/cek-status-pembayaran/${reservasiId}`);
       return { success: true, data: res.data };
     } catch (err) {
       console.error("Error cekStatusPembayaran:", err);
